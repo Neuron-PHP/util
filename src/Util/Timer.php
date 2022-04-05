@@ -4,7 +4,6 @@ namespace Neuron\Util;
 
 /**
  * Class for performing stopwatch functions.
- * @package Neuron\Util
  */
 class Timer implements ITimer
 {

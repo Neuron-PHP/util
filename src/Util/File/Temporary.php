@@ -3,38 +3,37 @@
 namespace Neuron\Util\File;
 
 /**
- * Class Temporary
- * @package Neuron\File
+ * Temporary file management.
  */
 
 class Temporary
 {
 	/**
-	 * @param string $sDirectory
+	 * @param string $Directory
 	 * @return string
 	 */
 
-	static public function getFile( $sDirectory = '' )
+	static public function getFile( string $Directory = '' ) : string
 	{
-		if( !$sDirectory )
+		if( !$Directory )
 		{
-			$sDirectory = sys_get_temp_dir();
+			$Directory = sys_get_temp_dir();
 		}
 
-		$sFilename = '';
+		$Filename = '';
 
 		$bFound = false;
 
 		while( !$bFound )
 		{
-			$sFilename = $sDirectory.'/'.uniqid( 'Temp', true );
+			$Filename = $Directory.'/'.uniqid( 'Temp', true );
 
-			if( !file_exists( $sFilename ) )
+			if( !file_exists( $Filename ) )
 			{
 				$bFound = true;
 			}
 		}
 
-		return $sFilename;
+		return $Filename;
 	}
 }
