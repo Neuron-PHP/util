@@ -5,6 +5,9 @@ namespace Neuron\Util;
 use \Neuron\Patterns\Singleton;
 use \Neuron\Data\Parser\CSV;
 
+/**
+ * Singleton based language dictionary.
+ */
 class Language extends Singleton\Memcache
 {
 	const LANGUAGE = 'language';

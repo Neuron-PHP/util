@@ -4,6 +4,9 @@ namespace Neuron\Util;
 
 use Neuron\Patterns\Singleton\Memory;
 
+/**
+ * Singleton based timer.
+ */
 class SystemTimer extends Memory
 {
 	private $_Timer;

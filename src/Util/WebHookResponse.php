@@ -21,7 +21,7 @@ class WebHookResponse
 	 * @param mixed $HttpCode
 	 * @return WebHookResponse
 	 */
-	public function setHttpCode( $HttpCode )
+	public function setHttpCode( $HttpCode ) : WebHookResponse
 	{
 		$this->_HttpCode = $HttpCode;
 		return $this;
@@ -39,7 +39,7 @@ class WebHookResponse
 	 * @param mixed $Data
 	 * @return WebHookResponse
 	 */
-	public function setData( $Data )
+	public function setData( $Data ) : WebHookResponse
 	{
 		$this->_Data = $Data;
 		return $this;
@@ -64,18 +64,18 @@ class WebHookResponse
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
-	public function getErrorString()
+	public function getErrorString() : string
 	{
 		return $this->_ErrorString;
 	}
 
 	/**
-	 * @param mixed $ErrorString
+	 * @param string $ErrorString
 	 * @return WebHookResponse
 	 */
-	public function setErrorString( $ErrorString )
+	public function setErrorString( string $ErrorString )
 	{
 		$this->_ErrorString = $ErrorString;
 		return $this;

@@ -33,7 +33,7 @@ class WebHook implements IWebHook
 	 * @param array $Params
 	 * @return mixed
 	 */
-	public function get( $Url, array $Params = [] ) : WebHookResponse
+	public function get( string $Url, array $Params = [] ) : WebHookResponse
 	{
 		$ParamString = '';
 
@@ -66,7 +66,7 @@ class WebHook implements IWebHook
 	 * @param array $Params
 	 * @return mixed
 	 */
-	public function post( $Url, array $Params = [] ) : WebHookResponse
+	public function post( string $Url, array $Params = [] ) : WebHookResponse
 	{
 		curl_setopt_array(
 			$this->_Handle,
@@ -89,7 +89,7 @@ class WebHook implements IWebHook
 	 * @param string $Json
 	 * @return WebHookResponse
 	 */
-	public function postJson( $Url, string $Json ) : WebHookResponse
+	public function postJson( string $Url, string $Json ) : WebHookResponse
 	{
 		curl_setopt_array(
 			$this->_Handle,

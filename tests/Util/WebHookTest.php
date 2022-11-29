@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 class WebHookTest extends TestCase
 {
+	/**
 	public function testGet200()
 	{
 		$Webhook = new WebHook();
@@ -28,6 +29,7 @@ class WebHookTest extends TestCase
 			$Data
 		);
 	}
+	 */
 
 	public function testGet401()
 	{
