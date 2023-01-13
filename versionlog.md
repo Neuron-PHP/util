@@ -1,3 +1,6 @@
+## 0.6.1 2023-01-13
+* Added the env class.
+
 ## 0.5.2
 * Made IRunnable argv default to empty array.
 
