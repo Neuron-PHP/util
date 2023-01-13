@@ -1,0 +1,3 @@
+# Test .env file
+APP_NAME=The Phpenv Package
+APP_ENV=local
