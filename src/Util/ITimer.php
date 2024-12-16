@@ -3,7 +3,7 @@
 namespace Neuron\Util;
 
 /**
- * Timer interface
+ * Stopwatch capabilities.
  */
 interface ITimer
 {
