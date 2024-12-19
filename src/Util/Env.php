@@ -11,10 +11,7 @@ class Env
 	 */
 	private function __construct( string $File = null)
 	{
-		if( file_exists( $File ) )
-		{
-			$this->loadEnvFile( $File );
-		}
+		$this->loadEnvFile( $File );
 	}
 
 	/**
@@ -34,11 +31,16 @@ class Env
 	/**
 	 * @param string $File
 	 */
-	public function loadEnvFile( string $File )
+	public function loadEnvFile( string $File = null )
 	{
 		if ( is_null( $File ) )
 		{
 			$File = "{$_SERVER['DOCUMENT_ROOT']}/.env";
+		}
+
+		if( !file_exists($File) )
+		{
+			return;
 		}
 
 		$envConfigsArr = file( $File );
