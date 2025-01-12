@@ -1,13 +1,9 @@
 ## 0.6.6
-
 ## 0.6.5
-
 ## 0.6.4
-
 ## 0.6.3
-
 ## 0.6.2 2024-12-16
-# Updated core packages.
+* Updated core packages.
 
 ## 0.6.1 2023-01-13
 * Added the env class.
