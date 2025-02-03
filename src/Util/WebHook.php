@@ -85,7 +85,7 @@ class WebHook implements IWebHook
 	}
 
 	/**
-	 * @param $Url
+	 * @param string $Url
 	 * @param string $Json
 	 * @return WebHookResponse
 	 */
@@ -96,6 +96,7 @@ class WebHook implements IWebHook
 			[
 				CURLOPT_URL           => $Url,
 				CURLOPT_CUSTOMREQUEST => 'POST',
+				CURLOPT_TIMEOUT		 => 10,
 				CURLOPT_POSTFIELDS    => $Json,
 				CURLOPT_HTTPHEADER    => [
 					'Content-Type: application/json',
