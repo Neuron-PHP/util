@@ -4,24 +4,24 @@ class LanguageTest extends PHPUnit\Framework\TestCase
 {
 	public function testLoad()
 	{
-		$Language = new \Neuron\Util\Language();
+		$language = new \Neuron\Util\Language();
 
 		$this->assertTrue(
-			$Language->load(
+			$language->load(
 				"english,title,Awesome program
 			french,title,Programme genial"
 			)
 		);
 
 		$this->assertTrue(
-			$Language->getText( '', 'english' ) == null
+			$language->getText( '', 'english' ) == null
 		);
 
 		$this->assertTrue(
-			$Language->getText( 'meh', 'meh' ) == null
+			$language->getText( 'meh', 'meh' ) == null
 		);
 
-		$out = $Language->getText( 'title', 'english' );
+		$out = $language->getText( 'title', 'english' );
 
 		$this->assertEquals(
 			'Awesome program',
@@ -30,7 +30,7 @@ class LanguageTest extends PHPUnit\Framework\TestCase
 
 		$this->assertEquals(
 			'Programme genial',
-			$Language->getText( 'title', 'french' )
+			$language->getText( 'title', 'french' )
 		);
 	}
 }

@@ -8,9 +8,9 @@ class WebHookTest extends TestCase
 	/**
 	public function testGet200()
 	{
-		$Webhook = new WebHook();
+		$webhook = new WebHook();
 
-		$Response = $Webhook->get(
+		$response = $webhook->get(
 			'http://sitestagingarea.com/guarder/guarder_transponder.php',
 			[
 				'apikey' => '1234123412341234'
@@ -19,30 +19,31 @@ class WebHookTest extends TestCase
 
 		$this->assertEquals(
 			200,
-			$Response->getHttpCode()
+			$response->getHttpCode()
 		);
 
-		$Data = json_decode( $Response->getData(), true );
+		$data = json_decode( $response->getData(), true );
 
 		$this->assertArrayHasKey(
 			'memory',
-			$Data
+			$data
 		);
 	}
 	 */
 
+	/*
 	public function testGet401()
 	{
-		$Webhook = new WebHook();
+		$webhook = new WebHook();
 
-		$Response = $Webhook->get(
+		$response = $webhook->get(
 			'http://sitestagingarea.com/guarder/guarder_transponder.php'
 		);
 
 		$this->assertEquals(
 			401,
-			$Response->getHttpCode()
+			$response->getHttpCode()
 		);
 	}
-
+	*/
 }

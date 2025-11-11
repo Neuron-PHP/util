@@ -7,47 +7,47 @@ class TimerTest extends PHPUnit\Framework\TestCase
 {
 	public function testTimer()
 	{
-		$iOffset = 5;
+		$offset = 5;
 
-		$Timer = new Neuron\Util\Timer( $iOffset );
+		$timer = new Neuron\Util\Timer( $offset );
 
-		$iElapsed = $Timer->getElapsed();
+		$elapsed = $timer->getElapsed();
 
-		$this->assertEquals( $iElapsed, $iOffset );
+		$this->assertEquals( $elapsed, $offset );
 	}
 
 	public function testReset()
 	{
-		$Timer = new \Neuron\Util\Timer();
+		$timer = new \Neuron\Util\Timer();
 
-		$Timer->start();
+		$timer->start();
 
 		sleep( 2 );
 
-		$Timer->reset();
+		$timer->reset();
 
 		$this->assertEquals(
-			$Timer->getElapsed(),
+			$timer->getElapsed(),
 			0
 		);
 	}
 
 	public function testLaps()
 	{
-		$Timer = new \Neuron\Util\Timer();
+		$timer = new \Neuron\Util\Timer();
 
-		$Timer->start();
+		$timer->start();
 
 		sleep( 1 );
-		$this->assertTrue( $Timer->lap( 'one' ) > 0 );
+		$this->assertTrue( $timer->lap( 'one' ) > 0 );
 		sleep( 1 );
-		$this->assertTrue( $Timer->lap( 'two' ) > 0 );
+		$this->assertTrue( $timer->lap( 'two' ) > 0 );
 
-		$Laps = $Timer->getLaps();
+		$laps = $timer->getLaps();
 
-		$this->assertIsArray( $Laps );
+		$this->assertIsArray( $laps );
 
-		$this->assertArrayHasKey( 'one', $Laps );
-		$this->assertArrayHasKey( 'two', $Laps );
+		$this->assertArrayHasKey( 'one', $laps );
+		$this->assertArrayHasKey( 'two', $laps );
 	}
 }

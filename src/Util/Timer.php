@@ -7,24 +7,24 @@ namespace Neuron\Util;
  */
 class Timer implements ITimer
 {
-	private $_StartTime = 0;
-	private $_StopTime  = 0;
-	private $_MaxTime   = 0;
+	private $_startTime = 0;
+	private $_stopTime  = 0;
+	private $_maxTime   = 0;
 
-	private $_Laps = [];
+	private $_laps = [];
 
 	/**
 	 * Timer constructor.
-	 * @param int $iTime used for testing purposes.
+	 * @param int $time used for testing purposes.
 	 */
-	public function __construct( $iTime = 0 )
+	public function __construct( $time = 0 )
 	{
-		$this->_StopTime = $iTime;
+		$this->_stopTime = $time;
 	}
 
-	public function setMaxTime( int $Max ) : Timer
+	public function setMaxTime( int $max ) : Timer
 	{
-		$this->_MaxTime = $Max;
+		$this->_maxTime = $max;
 
 		return $this;
 	}
@@ -35,7 +35,7 @@ class Timer implements ITimer
 	public function start()
 	{
 		$this->reset();
-		$this->_StartTime = time();
+		$this->_startTime = time();
 	}
 
 	/**
@@ -43,7 +43,7 @@ class Timer implements ITimer
 	 */
 	public function stop()
 	{
-		$this->_StopTime = time();
+		$this->_stopTime = time();
 	}
 
 	/**
@@ -51,23 +51,23 @@ class Timer implements ITimer
 	 */
 	public function reset()
 	{
-		$this->_StartTime = 0;
-		$this->_StopTime  = 0;
-		$this->_MaxTime   = 0;
-		$this->_Laps      = [];
+		$this->_startTime = 0;
+		$this->_stopTime  = 0;
+		$this->_maxTime   = 0;
+		$this->_laps      = [];
 	}
 
-	public function lap( string $Name ) : int
+	public function lap( string $name ) : int
 	{
-		$Current              = $this->getElapsed();
-		$this->_Laps[ $Name ] = $Current;
+		$current              = $this->getElapsed();
+		$this->_laps[ $name ] = $current;
 
-		return $Current;
+		return $current;
 	}
 
 	public function getLaps() : array
 	{
-		return $this->_Laps;
+		return $this->_laps;
 	}
 
 	/**
@@ -75,18 +75,18 @@ class Timer implements ITimer
 	 */
 	public function getElapsed()
 	{
-		if( $this->_StartTime && !$this->_StopTime )
+		if( $this->_startTime && !$this->_stopTime )
 		{
-			return time() - $this->_StartTime;
+			return time() - $this->_startTime;
 		}
 
-		return $this->_StopTime - $this->_StartTime;
+		return $this->_stopTime - $this->_startTime;
 	}
 
-	public function execute( $Function )
+	public function execute( $function )
 	{
-		$Result = $Function();
+		$result = $function();
 
-		return $Result;
+		return $result;
 	}
 }

@@ -4,12 +4,12 @@ namespace Neuron\Util;
 
 class WebHook implements IWebHook
 {
-	private $_Handle;
+	private $_handle;
 
 	public function __construct()
 	{
-		$this->_Handle = curl_init();
-		curl_setopt( $this->_Handle, CURLOPT_RETURNTRANSFER, true );
+		$this->_handle = curl_init();
+		curl_setopt( $this->_handle, CURLOPT_RETURNTRANSFER, true );
 	}
 
 	/**
@@ -17,98 +17,98 @@ class WebHook implements IWebHook
 	 */
 	protected function getResponse() : WebHookResponse
 	{
-		$Response = new WebHookResponse();
+		$response = new WebHookResponse();
 
-		$Response->setData( curl_exec( $this->_Handle ) );
+		$response->setData( curl_exec( $this->_handle ) );
 
-		$Response->setError( curl_errno( $this->_Handle ) );
-		$Response->setErrorString( curl_error( $this->_Handle ) );
-		$Response->setHttpCode( curl_getinfo( $this->_Handle, CURLINFO_HTTP_CODE ) );
+		$response->setError( curl_errno( $this->_handle ) );
+		$response->setErrorString( curl_error( $this->_handle ) );
+		$response->setHttpCode( curl_getinfo( $this->_handle, CURLINFO_HTTP_CODE ) );
 
-		return $Response;
+		return $response;
 	}
 
 	/**
-	 * @param $Url
-	 * @param array $Params
+	 * @param $url
+	 * @param array $params
 	 * @return mixed
 	 */
-	public function get( string $Url, array $Params = [] ) : WebHookResponse
+	public function get( string $url, array $params = [] ) : WebHookResponse
 	{
-		$ParamString = '';
+		$paramString = '';
 
-		foreach( $Params as $Name => $Value )
+		foreach( $params as $name => $value )
 		{
-			if( $ParamString )
+			if( $paramString )
 			{
-				$ParamString .= '&';
+				$paramString .= '&';
 			}
 
-			$ParamString .= "$Name=$Value";
+			$paramString .= "$name=$value";
 		}
 
-		if( $ParamString )
+		if( $paramString )
 		{
-			$Url .= "?$ParamString";
+			$url .= "?$paramString";
 		}
 
-		curl_setopt( $this->_Handle, CURLOPT_URL, $Url );
+		curl_setopt( $this->_handle, CURLOPT_URL, $url );
 
-		$Response = $this->getResponse();
+		$response = $this->getResponse();
 
-		curl_close( $this->_Handle );
+		curl_close( $this->_handle );
 
-		return $Response;
+		return $response;
 	}
 
 	/**
-	 * @param $Url
-	 * @param array $Params
+	 * @param $url
+	 * @param array $params
 	 * @return mixed
 	 */
-	public function post( string $Url, array $Params = [] ) : WebHookResponse
+	public function post( string $url, array $params = [] ) : WebHookResponse
 	{
 		curl_setopt_array(
-			$this->_Handle,
+			$this->_handle,
 			[
-				CURLOPT_URL            => $Url,
+				CURLOPT_URL            => $url,
 				CURLOPT_POST           => true,
-				CURLOPT_POSTFIELDS     => $Params
+				CURLOPT_POSTFIELDS     => $params
 			]
 		);
 
-		$Response = $this->getResponse();
+		$response = $this->getResponse();
 
-		curl_close( $this->_Handle );
+		curl_close( $this->_handle );
 
-		return $Response;
+		return $response;
 	}
 
 	/**
-	 * @param string $Url
-	 * @param string $Json
+	 * @param string $url
+	 * @param string $json
 	 * @return WebHookResponse
 	 */
-	public function postJson( string $Url, string $Json ) : WebHookResponse
+	public function postJson( string $url, string $json ) : WebHookResponse
 	{
 		curl_setopt_array(
-			$this->_Handle,
+			$this->_handle,
 			[
-				CURLOPT_URL           => $Url,
+				CURLOPT_URL           => $url,
 				CURLOPT_CUSTOMREQUEST => 'POST',
 				CURLOPT_TIMEOUT		 => 10,
-				CURLOPT_POSTFIELDS    => $Json,
+				CURLOPT_POSTFIELDS    => $json,
 				CURLOPT_HTTPHEADER    => [
 					'Content-Type: application/json',
-					'Content-Length: ' . strlen( $Json )
+					'Content-Length: ' . strlen( $json )
 				]
 			]
 		);
 
-		$Response = $this->getResponse();
+		$response = $this->getResponse();
 
-		curl_close( $this->_Handle );
+		curl_close( $this->_handle );
 
-		return $Response;
+		return $response;
 	}
 }

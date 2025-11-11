@@ -2,21 +2,29 @@
 
 namespace Neuron\Util;
 
+/**
+ * Email utility class for sending HTML and text emails with attachments.
+ * 
+ * Provides a simple interface for composing and sending emails using PHP's mail() function.
+ * Supports multiple recipients (To, CC, BCC), file attachments, and both HTML and plain text content.
+ * 
+ * @package Neuron\Util
+ */
 class Email
 {
 	const EMAIL_TEXT = 0;
 	const EMAIL_HTML = 1;
 
-	private $_aToList		= array();
-	private $_aCCList		= array();
-	private $_aBCCList	= array();
-	private $_aAttachList= array();
+	private $_toList		= array();
+	private $_ccList		= array();
+	private $_bccList	= array();
+	private $_attachList= array();
 
-	private $_sHeaders;
-	private $_sMimeBoundry;
-	private $_sFrom;
-	private $_sSubject;
-	private $_sBody;
+	private $_headers;
+	private $_mimeBoundry;
+	private $_from;
+	private $_subject;
+	private $_body;
 
 	private $_type = Email::EMAIL_HTML;
 
@@ -37,12 +45,12 @@ class Email
 	{ return $this->_type; }
 
 	/**
-	 * @param $sAddr
+	 * @param $addr
 	 */
 
-	public function addTo( $sAddr )
+	public function addTo( $addr )
 	{
-		array_push( $this->_aToList, $sAddr );
+		array_push( $this->_toList, $addr );
 	}
 
 	/**
@@ -51,16 +59,16 @@ class Email
 
 	public function getToList()
 	{
-		return $this->_aToList;
+		return $this->_toList;
 	}
 
 	/**
-	 * @param $sAddr
+	 * @param $addr
 	 */
 
-	public function addCC( $sAddr )
+	public function addCC( $addr )
 	{
-		array_push( $this->_aCCList, $sAddr );
+		array_push( $this->_ccList, $addr );
 	}
 
 	/**
@@ -69,16 +77,16 @@ class Email
 
 	public function getCCList()
 	{
-		return $this->_aCCList;
+		return $this->_ccList;
 	}
 
 	/**
-	 * @param $sAddr
+	 * @param $addr
 	 */
 
-	public function addBCC( $sAddr )
+	public function addBCC( $addr )
 	{
-		array_push( $this->_aBCCList, $sAddr );
+		array_push( $this->_bccList, $addr );
 	}
 
 	/**
@@ -87,16 +95,16 @@ class Email
 
 	public function getBCCList()
 	{
-		return $this->_aBCCList;
+		return $this->_bccList;
 	}
 
 	/**
-	 * @param $sFile
+	 * @param $file
 	 */
 
-	public function attachFile( $sFile )
+	public function attachFile( $file )
 	{
-		array_push( $this->_aAttachList, $sFile );
+		array_push( $this->_attachList, $file );
 	}
 
 	/**
@@ -105,30 +113,30 @@ class Email
 
 	public function getAttachList()
 	{
-		return $this->_aAttachList;
+		return $this->_attachList;
 	}
 
 	/**
-	 * @param $sFrom
+	 * @param $from
 	 */
 
-	public function setFrom( $sFrom )
+	public function setFrom( $from )
 	{
-		$this->_sFrom = $sFrom;
+		$this->_from = $from;
 	}
 
 	public function getFrom()
 	{
-		return $this->_sFrom;
+		return $this->_from;
 	}
 
 	/**
-	 * @param $sSubject
+	 * @param $subject
 	 */
 
-	public function setSubject( $sSubject )
+	public function setSubject( $subject )
 	{
-		$this->_sSubject = $sSubject;
+		$this->_subject = $subject;
 	}
 
 	/**
@@ -137,16 +145,16 @@ class Email
 
 	public function getSubject()
 	{
-		return $this->_sSubject;
+		return $this->_subject;
 	}
 
 	/**
-	 * @param $sBody
+	 * @param $body
 	 */
 
-	public function setBody( $sBody )
+	public function setBody( $body )
 	{
-		$this->_sBody = $sBody;
+		$this->_body = $body;
 	}
 
 	/**
@@ -155,7 +163,7 @@ class Email
 
 	public function getBody()
 	{
-		return $this->_sBody;
+		return $this->_body;
 	}
 
 	/**
@@ -165,30 +173,30 @@ class Email
 
 	protected function getArrayList( $arr )
 	{
-		$sList = "";
+		$list = "";
 
 		foreach( $arr as $s )
 		{
-			if( strlen( $sList ) )
-				$sList .= ',';
-			$sList .= $s;
+			if( strlen( $list ) )
+				$list .= ',';
+			$list .= $s;
 		}
-		return $sList;
+		return $list;
 	}
 
 	/**
-	 * @param $sName
+	 * @param $name
 	 * @return string
 	 */
 
-	protected function getAttachmentCode( $sName )
+	protected function getAttachmentCode( $name )
 	{
-		$file = fopen( $sName, 'rb' );
-		$data = fread( $file, filesize( $sName ) );
+		$file = fopen( $name, 'rb' );
+		$data = fread( $file, filesize( $name ) );
 		fclose( $file );
 
 		$message = "This is a multi-part message in MIME format.\n\n" .
-						 "--{$this->_sMimeBoundry}\n";
+						 "--{$this->_mimeBoundry}\n";
 
 		if( $this->_type == Email::EMAIL_TEXT )
 		{
@@ -200,24 +208,24 @@ class Email
 		}
 
 		$message .= "Content-Transfer-Encoding: 7bit\n\n" .
-						$this->_sBody . "\n\n";
+						$this->_body . "\n\n";
 
 		// Base64 encode the file data
 		$data = chunk_split( base64_encode( $data ) );
 
 		// Add file attachment to the message
 
-		$fileatt_type = filetype( $sName );
-		$fileatt_name = basename( $sName );
+		$fileattType = filetype( $name );
+		$fileattName = basename( $name );
 
-		$message .= "--{$this->_sMimeBoundry}\n" .
-						"Content-Type: {$fileatt_type};\n" .
-						" name=\"{$fileatt_name}\"\n" .
+		$message .= "--{$this->_mimeBoundry}\n" .
+						"Content-Type: {$fileattType};\n" .
+						" name=\"{$fileattName}\"\n" .
 						"Content-Disposition: attachment;\n" .
-						" filename=\"{$fileatt_name}\"\n" .
+						" filename=\"{$fileattName}\"\n" .
 						"Content-Transfer-Encoding: base64\n\n" .
 						$data . "\n\n" .
-						"--{$this->_sMimeBoundry}--\n";
+						"--{$this->_mimeBoundry}--\n";
 
 		return $message;
 	}
@@ -230,17 +238,17 @@ class Email
 	{
 		$message = '';
 		$headers = '';
-		
-		if( count( $this->_aAttachList ) )
+
+		if( count( $this->_attachList ) )
 		{
-			$semi_rand = md5(time());
-			$this->_sMimeBoundry = "==Multipart_Boundary_x{$semi_rand}x";
+			$semiRand = md5(time());
+			$this->_mimeBoundry = "==Multipart_Boundary_x{$semiRand}x";
 
-			$this->_sHeaders .= "Content-Type: multipart/mixed;\n" .
-									" boundary=\"{$this->_sMimeBoundry}\"";
+			$this->_headers .= "Content-Type: multipart/mixed;\n" .
+									" boundary=\"{$this->_mimeBoundry}\"";
 
-			foreach( $this->getAttachList() as $strName )
-				$message .= $this->getAttachmentCode( $strName );
+			foreach( $this->getAttachList() as $name )
+				$message .= $this->getAttachmentCode( $name );
 		}
 		else
 		{
