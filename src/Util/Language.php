@@ -3,7 +3,7 @@
 namespace Neuron\Util;
 
 use \Neuron\Patterns\Singleton;
-use \Neuron\Data\Parser\CSV;
+use \Neuron\Data\Parsers\CSV;
 
 /**
  * Singleton based language dictionary.
