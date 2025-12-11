@@ -2,36 +2,59 @@
 
 namespace Tests\Util;
 
+use Neuron\Core\System\MemoryHttpClient;
+use Neuron\Core\System\HttpResponse;
 use Neuron\Util\WebHook;
 use Neuron\Util\WebHookResponse;
 use PHPUnit\Framework\TestCase;
 
 class WebHookTest extends TestCase
 {
+	private MemoryHttpClient $httpClient;
+	private WebHook $webhook;
+
+	protected function setUp(): void
+	{
+		$this->httpClient = new MemoryHttpClient();
+		$this->webhook = new WebHook( $this->httpClient );
+	}
+
 	public function testConstructor()
 	{
 		$webhook = new WebHook();
+		$this->assertInstanceOf( WebHook::class, $webhook );
+	}
 
+	public function testConstructorWithHttpClient()
+	{
+		$client = new MemoryHttpClient();
+		$webhook = new WebHook( $client );
 		$this->assertInstanceOf( WebHook::class, $webhook );
 	}
 
 	public function testGetWithoutParameters()
 	{
-		$webhook = new WebHook();
+		// Program a successful response for any URL
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 200, '{"status":"success"}', [] )
+		);
 
-		// Test with a simple URL (will fail in test environment but shouldn't throw exception)
-		// Using @ to suppress curl errors in test environment
-		$response = @$webhook->get( 'http://localhost:9999/test' );
+		$response = $this->webhook->get( 'https://api.example.com/test' );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
-		$this->assertIsInt( $response->getHttpCode() );
-		$this->assertIsInt( $response->getError() );
-		$this->assertIsString( $response->getErrorString() );
+		$this->assertEquals( 200, $response->getHttpCode() );
+		$this->assertEquals( '{"status":"success"}', $response->getData() );
+		$this->assertEquals( 0, $response->getError() );
+		$this->assertEquals( '', $response->getErrorString() );
 	}
 
 	public function testGetWithParameters()
 	{
-		$webhook = new WebHook();
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 200, '{"data":"found"}', [] )
+		);
 
 		$params = [
 			'key1' => 'value1',
@@ -39,47 +62,82 @@ class WebHookTest extends TestCase
 			'test' => 'data'
 		];
 
-		// Test that URL is built correctly (will fail to connect but structure is tested)
-		$response = @$webhook->get( 'http://localhost:9999/api', $params );
+		$response = $this->webhook->get( 'https://api.example.com/api', $params );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
-		$this->assertIsInt( $response->getHttpCode() );
+		$this->assertEquals( 200, $response->getHttpCode() );
+		$this->assertEquals( '{"data":"found"}', $response->getData() );
+
+		// Verify the request was made correctly
+		$requests = $this->httpClient->getRequests();
+		$this->assertCount( 1, $requests );
+		$this->assertEquals( 'GET', $requests[0]['method'] );
+		// URL will have query string appended
+		$this->assertStringContainsString( 'https://api.example.com/api', $requests[0]['url'] );
 	}
 
 	public function testGetWithSingleParameter()
 	{
-		$webhook = new WebHook();
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 200, '{"id":"123","found":true}', [] )
+		);
 
 		$params = ['id' => '123'];
-
-		$response = @$webhook->get( 'http://localhost:9999/resource', $params );
+		$response = $this->webhook->get( 'https://api.example.com/resource', $params );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
+		$this->assertEquals( 200, $response->getHttpCode() );
 	}
 
 	public function testGetWithEmptyParameters()
 	{
-		$webhook = new WebHook();
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 200, '{"message":"ok"}', [] )
+		);
 
 		// Empty params should result in URL without query string
-		$response = @$webhook->get( 'http://localhost:9999/endpoint', [] );
+		$response = $this->webhook->get( 'https://api.example.com/endpoint', [] );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
+		$this->assertEquals( 200, $response->getHttpCode() );
+	}
+
+	public function testGetWith404Response()
+	{
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 404, '{"error":"not found"}', [] )
+		);
+
+		$response = $this->webhook->get( 'https://api.example.com/missing' );
+
+		$this->assertInstanceOf( WebHookResponse::class, $response );
+		$this->assertEquals( 404, $response->getHttpCode() );
+		$this->assertEquals( '{"error":"not found"}', $response->getData() );
 	}
 
 	public function testPostWithoutParameters()
 	{
-		$webhook = new WebHook();
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 201, '{"id":1,"created":true}', [] )
+		);
 
-		$response = @$webhook->post( 'http://localhost:9999/submit' );
+		$response = $this->webhook->post( 'https://api.example.com/submit' );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
-		$this->assertIsInt( $response->getHttpCode() );
+		$this->assertEquals( 201, $response->getHttpCode() );
+		$this->assertEquals( '{"id":1,"created":true}', $response->getData() );
 	}
 
 	public function testPostWithParameters()
 	{
-		$webhook = new WebHook();
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 200, '{"authenticated":true,"token":"abc123"}', [] )
+		);
 
 		$params = [
 			'username' => 'testuser',
@@ -87,24 +145,37 @@ class WebHookTest extends TestCase
 			'action' => 'login'
 		];
 
-		$response = @$webhook->post( 'http://localhost:9999/auth', $params );
+		$response = $this->webhook->post( 'https://api.example.com/auth', $params );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
-		$this->assertIsInt( $response->getHttpCode() );
+		$this->assertEquals( 200, $response->getHttpCode() );
+
+		// Verify the request was made correctly
+		$requests = $this->httpClient->getRequests();
+		$this->assertCount( 1, $requests );
+		$this->assertEquals( 'POST', $requests[0]['method'] );
+		$this->assertEquals( $params, $requests[0]['data'] );
 	}
 
 	public function testPostWithEmptyParameters()
 	{
-		$webhook = new WebHook();
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 200, '{"success":true}', [] )
+		);
 
-		$response = @$webhook->post( 'http://localhost:9999/submit', [] );
+		$response = $this->webhook->post( 'https://api.example.com/submit', [] );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
+		$this->assertEquals( 200, $response->getHttpCode() );
 	}
 
 	public function testPostJson()
 	{
-		$webhook = new WebHook();
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 201, '{"id":42,"created":true}', [] )
+		);
 
 		$json = json_encode([
 			'name' => 'Test User',
@@ -112,26 +183,38 @@ class WebHookTest extends TestCase
 			'active' => true
 		]);
 
-		$response = @$webhook->postJson( 'http://localhost:9999/api/users', $json );
+		$response = $this->webhook->postJson( 'https://api.example.com/api/users', $json );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
-		$this->assertIsInt( $response->getHttpCode() );
+		$this->assertEquals( 201, $response->getHttpCode() );
+
+		// Verify the request was made correctly
+		$requests = $this->httpClient->getRequests();
+		$this->assertCount( 1, $requests );
+		$this->assertEquals( 'POST', $requests[0]['method'] );
+		$this->assertEquals( ['json' => $json], $requests[0]['data'] );
 	}
 
 	public function testPostJsonWithEmptyJson()
 	{
-		$webhook = new WebHook();
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 200, '{"received":true}', [] )
+		);
 
 		$json = '{}';
-
-		$response = @$webhook->postJson( 'http://localhost:9999/api/data', $json );
+		$response = $this->webhook->postJson( 'https://api.example.com/api/data', $json );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
+		$this->assertEquals( 200, $response->getHttpCode() );
 	}
 
 	public function testPostJsonWithComplexJson()
 	{
-		$webhook = new WebHook();
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 200, '{"processed":true}', [] )
+		);
 
 		$json = json_encode([
 			'user' => [
@@ -143,59 +226,69 @@ class WebHookTest extends TestCase
 				]
 			],
 			'metadata' => [
-				'timestamp' => time(),
+				'timestamp' => 1234567890,
 				'version' => '1.0'
 			]
 		]);
 
-		$response = @$webhook->postJson( 'http://localhost:9999/api/complex', $json );
+		$response = $this->webhook->postJson( 'https://api.example.com/api/complex', $json );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
+		$this->assertEquals( 200, $response->getHttpCode() );
 	}
 
-	public function testGetResponseProtectedMethod()
+	public function testErrorHandling()
 	{
-		$webhook = new WebHook();
+		// Use addErrorResponse helper method
+		$this->httpClient->addErrorResponse( '*', 'Failed to connect to host', 7 );
 
-		// Use reflection to test the protected getResponse method
-		$reflection = new \ReflectionClass( $webhook );
-		$method = $reflection->getMethod( 'getResponse' );
-		$method->setAccessible( true );
-
-		// Initialize curl with a URL first
-		$property = $reflection->getProperty( '_handle' );
-		$property->setAccessible( true );
-		$handle = $property->getValue( $webhook );
-
-		curl_setopt( $handle, CURLOPT_URL, 'http://localhost:9999/test' );
-
-		$response = @$method->invoke( $webhook );
+		$response = $this->webhook->get( 'https://invalid.example.com/test' );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
-		$this->assertIsInt( $response->getHttpCode() );
-		$this->assertIsInt( $response->getError() );
-		$this->assertIsString( $response->getErrorString() );
+		$this->assertEquals( 7, $response->getError() );
+		$this->assertEquals( 'Failed to connect to host', $response->getErrorString() );
 	}
 
 	public function testMultipleSequentialRequests()
 	{
-		// Test that we can make multiple requests
-		$webhook1 = new WebHook();
-		$response1 = @$webhook1->get( 'http://localhost:9999/test1' );
+		// Program multiple responses for different URLs
+		$this->httpClient->addResponse(
+			'*test1*',
+			new HttpResponse( 200, '{"result":"test1"}', [] )
+		);
+		$this->httpClient->addResponse(
+			'*test2*',
+			new HttpResponse( 200, '{"result":"test2"}', [] )
+		);
+		$this->httpClient->addResponse(
+			'*test3*',
+			new HttpResponse( 200, '{"result":"test3"}', [] )
+		);
+
+		// Make multiple requests
+		$response1 = $this->webhook->get( 'https://api.example.com/test1' );
 		$this->assertInstanceOf( WebHookResponse::class, $response1 );
+		$this->assertEquals( '{"result":"test1"}', $response1->getData() );
 
-		$webhook2 = new WebHook();
-		$response2 = @$webhook2->post( 'http://localhost:9999/test2' );
+		$response2 = $this->webhook->post( 'https://api.example.com/test2' );
 		$this->assertInstanceOf( WebHookResponse::class, $response2 );
+		$this->assertEquals( '{"result":"test2"}', $response2->getData() );
 
-		$webhook3 = new WebHook();
-		$response3 = @$webhook3->postJson( 'http://localhost:9999/test3', '{"test": true}' );
+		$response3 = $this->webhook->postJson( 'https://api.example.com/test3', '{"test": true}' );
 		$this->assertInstanceOf( WebHookResponse::class, $response3 );
+		$this->assertEquals( '{"result":"test3"}', $response3->getData() );
+
+		// Verify all three requests were recorded
+		$requests = $this->httpClient->getRequests();
+		$this->assertCount( 3, $requests );
 	}
 
 	public function testGetParameterEncoding()
 	{
-		$webhook = new WebHook();
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 200, '{"results":[]}', [] )
+		);
 
 		$params = [
 			'search' => 'test query',
@@ -204,46 +297,63 @@ class WebHookTest extends TestCase
 		];
 
 		// Test that parameters are properly formatted
-		$response = @$webhook->get( 'http://localhost:9999/search', $params );
+		$response = $this->webhook->get( 'https://api.example.com/search', $params );
 
 		$this->assertInstanceOf( WebHookResponse::class, $response );
+		$this->assertEquals( 200, $response->getHttpCode() );
+
+		// Verify request was recorded with URL containing query string
+		$requests = $this->httpClient->getRequests();
+		$this->assertStringContainsString( 'search=test+query', $requests[0]['url'] );
 	}
 
-	public function testResponsePropertiesAfterGet()
+	public function testResponseConversion()
 	{
-		$webhook = new WebHook();
+		// Test that IHttpResponse is correctly converted to WebHookResponse
+		$this->httpClient->addResponse(
+			'*',
+			new HttpResponse( 201, 'Created', ['Location' => '/resource/123'] )
+		);
 
-		$response = @$webhook->get( 'http://localhost:9999/endpoint' );
+		$response = $this->webhook->post( 'https://api.example.com/resource', ['name' => 'test'] );
 
-		// Verify response has expected properties set
-		$this->assertNotNull( $response->getHttpCode() );
-		$this->assertNotNull( $response->getError() );
-		$this->assertNotNull( $response->getErrorString() );
-		// getData() can be null, false, or string depending on curl result
+		// Verify all properties are correctly mapped
+		$this->assertEquals( 201, $response->getHttpCode() );
+		$this->assertEquals( 'Created', $response->getData() );
+		$this->assertEquals( 0, $response->getError() );
+		$this->assertEquals( '', $response->getErrorString() );
 	}
 
-	public function testResponsePropertiesAfterPost()
+	public function testConvertResponseProtectedMethod()
 	{
-		$webhook = new WebHook();
+		// Test the protected convertResponse method using reflection
+		$httpResponse = new HttpResponse( 200, 'test body', [] );
 
-		$response = @$webhook->post( 'http://localhost:9999/endpoint', ['key' => 'value'] );
+		$reflection = new \ReflectionClass( $this->webhook );
+		$method = $reflection->getMethod( 'convertResponse' );
+		$method->setAccessible( true );
 
-		// Verify response has expected properties set
-		$this->assertNotNull( $response->getHttpCode() );
-		$this->assertNotNull( $response->getError() );
-		$this->assertNotNull( $response->getErrorString() );
+		$webHookResponse = $method->invoke( $this->webhook, $httpResponse );
+
+		$this->assertInstanceOf( WebHookResponse::class, $webHookResponse );
+		$this->assertEquals( 200, $webHookResponse->getHttpCode() );
+		$this->assertEquals( 'test body', $webHookResponse->getData() );
 	}
 
-	public function testResponsePropertiesAfterPostJson()
+	public function testTimeoutIsSet()
 	{
-		$webhook = new WebHook();
+		// Create a new webhook which should set timeout on construction
+		$client = new MemoryHttpClient();
+		$webhook = new WebHook( $client );
 
-		$response = @$webhook->postJson( 'http://localhost:9999/api', '{"data": "value"}' );
+		// The constructor should have called setTimeout(10)
+		// We can verify this by checking that MemoryHttpClient received the call
+		// MemoryHttpClient stores timeout internally
+		$reflection = new \ReflectionClass( $client );
+		$property = $reflection->getProperty( 'timeout' );
+		$property->setAccessible( true );
 
-		// Verify response has expected properties set
-		$this->assertNotNull( $response->getHttpCode() );
-		$this->assertNotNull( $response->getError() );
-		$this->assertNotNull( $response->getErrorString() );
+		$this->assertEquals( 10, $property->getValue( $client ) );
 	}
 }
 
