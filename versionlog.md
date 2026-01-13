@@ -6,7 +6,7 @@
 * Tests rewritten to use `MemoryHttpClient` for deterministic, fast testing without network dependencies
 * Timeout still defaults to 10 seconds as before
 
-## 0.6.9
+## 0.6.9 2026-01-13
 
 ## 0.6.8 2025-02-03
 * Added a timeout to webhook.
