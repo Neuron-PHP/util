@@ -1,8 +1,11 @@
 <?php
 
-use Neuron\Util\SystemTimer;
+namespace Tests\Util;
 
-class SystemTimerTest extends PHPUnit\Framework\TestCase
+use Neuron\Util\SystemTimer;
+use PHPUnit\Framework\TestCase;
+
+class SystemTimerTest extends TestCase
 {
 	public function testGetLaps()
 	{

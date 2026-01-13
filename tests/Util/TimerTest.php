@@ -1,15 +1,20 @@
 <?php
 
+namespace Tests\Util;
+
+use Neuron\Util\Timer;
+use PHPUnit\Framework\TestCase;
+
 /**
- * Class TimerTest
+ * Timer Test
  */
-class TimerTest extends PHPUnit\Framework\TestCase
+class TimerTest extends TestCase
 {
 	public function testTimer()
 	{
 		$offset = 5;
 
-		$timer = new Neuron\Util\Timer( $offset );
+		$timer = new Timer( $offset );
 
 		$elapsed = $timer->getElapsed();
 
@@ -18,7 +23,7 @@ class TimerTest extends PHPUnit\Framework\TestCase
 
 	public function testReset()
 	{
-		$timer = new \Neuron\Util\Timer();
+		$timer = new Timer();
 
 		$timer->start();
 
@@ -34,7 +39,7 @@ class TimerTest extends PHPUnit\Framework\TestCase
 
 	public function testLaps()
 	{
-		$timer = new \Neuron\Util\Timer();
+		$timer = new Timer();
 
 		$timer->start();
 
@@ -53,16 +58,16 @@ class TimerTest extends PHPUnit\Framework\TestCase
 
 	public function testSetMaxTime()
 	{
-		$timer = new \Neuron\Util\Timer();
+		$timer = new Timer();
 
 		$result = $timer->setMaxTime( 60 );
 
-		$this->assertInstanceOf( \Neuron\Util\Timer::class, $result );
+		$this->assertInstanceOf( Timer::class, $result );
 	}
 
 	public function testSetMaxTimeWithChaining()
 	{
-		$timer = new \Neuron\Util\Timer();
+		$timer = new Timer();
 
 		// Test fluent interface
 		$result = $timer->setMaxTime( 120 )->start();
@@ -72,7 +77,7 @@ class TimerTest extends PHPUnit\Framework\TestCase
 
 	public function testStop()
 	{
-		$timer = new \Neuron\Util\Timer();
+		$timer = new Timer();
 
 		$timer->start();
 		sleep( 1 );
@@ -91,7 +96,7 @@ class TimerTest extends PHPUnit\Framework\TestCase
 
 	public function testExecute()
 	{
-		$timer = new \Neuron\Util\Timer();
+		$timer = new Timer();
 
 		$result = $timer->execute( function() {
 			return 'test result';
@@ -102,7 +107,7 @@ class TimerTest extends PHPUnit\Framework\TestCase
 
 	public function testExecuteWithReturnValue()
 	{
-		$timer = new \Neuron\Util\Timer();
+		$timer = new Timer();
 
 		$result = $timer->execute( function() {
 			return 42;
@@ -113,7 +118,7 @@ class TimerTest extends PHPUnit\Framework\TestCase
 
 	public function testGetElapsedWhileRunning()
 	{
-		$timer = new \Neuron\Util\Timer();
+		$timer = new Timer();
 
 		$timer->start();
 		sleep( 1 );

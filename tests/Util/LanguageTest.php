@@ -1,10 +1,15 @@
 <?php
 
-class LanguageTest extends PHPUnit\Framework\TestCase
+namespace Tests\Util;
+
+use Neuron\Util\Language;
+use PHPUnit\Framework\TestCase;
+
+class LanguageTest extends TestCase
 {
 	public function testLoad()
 	{
-		$language = new \Neuron\Util\Language();
+		$language = new Language();
 
 		$this->assertTrue(
 			$language->load(
@@ -36,7 +41,7 @@ class LanguageTest extends PHPUnit\Framework\TestCase
 
 	public function testLoadWithEmptyText()
 	{
-		$language = new \Neuron\Util\Language();
+		$language = new Language();
 
 		// Test with null/empty text
 		$this->assertFalse(
@@ -54,7 +59,7 @@ class LanguageTest extends PHPUnit\Framework\TestCase
 
 	public function testSetLanguage()
 	{
-		$language = new \Neuron\Util\Language();
+		$language = new Language();
 
 		// Load some test data
 		$language->load(
@@ -79,7 +84,7 @@ class LanguageTest extends PHPUnit\Framework\TestCase
 
 	public function testGetTextWithSessionLanguage()
 	{
-		$language = new \Neuron\Util\Language();
+		$language = new Language();
 
 		// Load test data
 		$language->load(
