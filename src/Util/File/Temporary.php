@@ -9,31 +9,31 @@ namespace Neuron\Util\File;
 class Temporary
 {
 	/**
-	 * @param string $Directory
+	 * @param string $directory
 	 * @return string
 	 */
 
-	static public function getFile( string $Directory = '' ) : string
+	static public function getFile( string $directory = '' ) : string
 	{
-		if( !$Directory )
+		if( !$directory )
 		{
-			$Directory = sys_get_temp_dir();
+			$directory = sys_get_temp_dir();
 		}
 
-		$Filename = '';
+		$filename = '';
 
-		$bFound = false;
+		$found = false;
 
-		while( !$bFound )
+		while( !$found )
 		{
-			$Filename = $Directory.'/'.uniqid( 'Temp', true );
+			$filename = $directory.'/'.uniqid( 'Temp', true );
 
-			if( !file_exists( $Filename ) )
+			if( !file_exists( $filename ) )
 			{
-				$bFound = true;
+				$found = true;
 			}
 		}
 
-		return $Filename;
+		return $filename;
 	}
 }

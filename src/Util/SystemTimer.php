@@ -9,62 +9,62 @@ use Neuron\Patterns\Singleton\Memory;
  */
 class SystemTimer extends Memory
 {
-	private $_Timer;
+	private $_timer;
 
 	public function init()
 	{
-		if( !$this->_Timer )
+		if( !$this->_timer )
 		{
-			$this->_Timer = new Timer();
+			$this->_timer = new Timer();
 			$this->serialize();
 		}
 	}
 
 	public static function start()
 	{
-		$Timer = self::getInstance();
-		$Timer->init();
-		$Timer->_Timer->start();
-		$Timer->serialize();
+		$timer = self::getInstance();
+		$timer->init();
+		$timer->_timer->start();
+		$timer->serialize();
 	}
 
 	public static function stop()
 	{
-		$Timer = self::getInstance();
-		$Timer->init();
-		$Timer->_Timer->stop();
-		$Timer->serialize();
+		$timer = self::getInstance();
+		$timer->init();
+		$timer->_timer->stop();
+		$timer->serialize();
 	}
 
 	public static function reset()
 	{
-		$Timer = self::getInstance();
-		$Timer->init();
-		$Timer->_Timer->reset();
-		$Timer->serialize();
+		$timer = self::getInstance();
+		$timer->init();
+		$timer->_timer->reset();
+		$timer->serialize();
 	}
 
-	public static function lap( string $Name ): int
+	public static function lap( string $name ): int
 	{
-		$Timer = self::getInstance();
-		$Timer->init();
-		$Lap   = $Timer->_Timer->lap( $Name );
+		$timer = self::getInstance();
+		$timer->init();
+		$lap   = $timer->_timer->lap( $name );
 
-		$Timer->serialize();
-		return $Lap;
+		$timer->serialize();
+		return $lap;
 	}
 
 	public static function getLaps(): array
 	{
-		$Timer = self::getInstance();
-		$Timer->init();
-		return $Timer->_Timer->getLaps();
+		$timer = self::getInstance();
+		$timer->init();
+		return $timer->_timer->getLaps();
 	}
 
 	public static function getElapsed()
 	{
-		$Timer = self::getInstance();
-		$Timer->init();
-		return $Timer->_Timer->getElapsed();
+		$timer = self::getInstance();
+		$timer->init();
+		return $timer->_timer->getElapsed();
 	}
 }

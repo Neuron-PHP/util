@@ -3,7 +3,7 @@
 namespace Neuron\Util;
 
 use \Neuron\Patterns\Singleton;
-use \Neuron\Data\Parser\CSV;
+use \Neuron\Data\Parsers\CSV;
 
 /**
  * Singleton based language dictionary.
@@ -14,37 +14,37 @@ class Language extends Singleton\Memcache
 	const ID       = 'id';
 	const TEXT     = 'text';
 
-	private $_aText;
+	private $_text;
 
 	/**
 	 * Loads csv data from a string. Format: language, id, text
-	 * @param $sText
+	 * @param $text
 	 * @return bool
 	 */
-	public function load( $sText )
+	public function load( $text )
 	{
-		if( !$sText )
+		if( !$text )
 		{
 			return false;
 		}
 
-		$Csv = new CSV();
+		$csv = new CSV();
 
-		$aLines = explode( "\n", $sText );
+		$lines = explode( "\n", $text );
 
-		if( !$aLines )
+		if( !$lines )
 		{
 			return false;
 		}
 
-		foreach( $aLines as $Text )
+		foreach( $lines as $textItem )
 		{
-			$Line = $Csv->parse( $Text, [ self::LANGUAGE, self::ID, self::TEXT ] );
+			$line = $csv->parse( $textItem, [ self::LANGUAGE, self::ID, self::TEXT ] );
 
-			$lang  = trim( $Line[ self::LANGUAGE ] );
-			$ident = trim( $Line[ self::ID ] );
+			$lang  = trim( $line[ self::LANGUAGE ] );
+			$ident = trim( $line[ self::ID ] );
 
-			$this->_aText[ $lang ][ $ident ] = trim( $Line[ self::TEXT ] );
+			$this->_text[ $lang ][ $ident ] = trim( $line[ self::TEXT ] );
 		}
 
 		return true;
@@ -52,39 +52,39 @@ class Language extends Singleton\Memcache
 
 	/**
 	 * Sets the current language in a session variable.
-	 * @param $sLanguage
+	 * @param $language
 	 */
 
-	public function setLanguage( $sLanguage )
+	public function setLanguage( $language )
 	{
-		$_SESSION[ 'language' ] = $sLanguage;
+		$_SESSION[ 'language' ] = $language;
 	}
 
 	/**
 	 * Gets the current language text for an id.
-	 * @param $sId
-	 * @param string $sLanguage
+	 * @param $id
+	 * @param string $language
 	 * @return string
 	 */
-	public function getText( $sId, $sLanguage = '' )
+	public function getText( $id, $language = '' )
 	{
-		if( !$sId )
+		if( !$id )
 		{
 			return null;
 		}
 
-		if( !$sLanguage )
+		if( !$language )
 		{
-			$sLanguage = $_SESSION[ 'language' ];
+			$language = $_SESSION[ 'language' ];
 		}
 
-		if( array_key_exists( $sLanguage, $this->_aText ) )
+		if( array_key_exists( $language, $this->_text ) )
 		{
-			$Language = $this->_aText[ $sLanguage ];
+			$languageText = $this->_text[ $language ];
 
-			if( array_key_exists( $sId, $Language ) )
+			if( array_key_exists( $id, $languageText ) )
 			{
-				return $Language[ $sId ];
+				return $languageText[ $id ];
 			}
 		}
 

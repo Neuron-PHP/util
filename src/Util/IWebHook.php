@@ -7,6 +7,6 @@ namespace Neuron\Util;
  */
 interface IWebHook
 {
-	public function get(  string $Url, array $Params );
-	public function post( string $Url, array $Params );
+	public function get(  string $url, array $params );
+	public function post( string $url, array $params );
 }

@@ -1,6 +1,12 @@
-## 0.6.9
+## 0.7.0 2025-12-11
+* **WebHook refactored to use system abstractions** - Now uses `IHttpClient` interface instead of direct curl calls
+* Added `neuron-php/core` 0.8.* dependency for system abstractions
+* WebHook now supports dependency injection with optional `IHttpClient` parameter
+* Maintains full backward compatibility - existing code works without changes
+* Tests rewritten to use `MemoryHttpClient` for deterministic, fast testing without network dependencies
+* Timeout still defaults to 10 seconds as before
 
-## 0.6.9
+## 0.6.9 2026-01-13
 
 ## 0.6.8 2025-02-03
 * Added a timeout to webhook.

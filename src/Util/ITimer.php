@@ -22,7 +22,7 @@ interface ITimer
 	 */
 	public function reset();
 
-	public function lap( string $Name ): int;
+	public function lap( string $name ): int;
 
 	public function getLaps(): array;
 
