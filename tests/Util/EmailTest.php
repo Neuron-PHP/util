@@ -117,7 +117,6 @@ class EmailTest extends TestCase
 
 		$reflection = new \ReflectionClass( $email );
 		$method = $reflection->getMethod( 'getArrayList' );
-		$method->setAccessible( true );
 
 		$result = $method->invoke( $email, [] );
 		$this->assertEquals( '', $result );
@@ -129,7 +128,6 @@ class EmailTest extends TestCase
 
 		$reflection = new \ReflectionClass( $email );
 		$method = $reflection->getMethod( 'getArrayList' );
-		$method->setAccessible( true );
 
 		$result = $method->invoke( $email, ['user@example.com'] );
 		$this->assertEquals( 'user@example.com', $result );
@@ -141,7 +139,6 @@ class EmailTest extends TestCase
 
 		$reflection = new \ReflectionClass( $email );
 		$method = $reflection->getMethod( 'getArrayList' );
-		$method->setAccessible( true );
 
 		$result = $method->invoke( $email, ['user1@example.com', 'user2@example.com', 'user3@example.com'] );
 		$this->assertEquals( 'user1@example.com,user2@example.com,user3@example.com', $result );
@@ -159,7 +156,6 @@ class EmailTest extends TestCase
 
 		$reflection = new \ReflectionClass( $email );
 		$method = $reflection->getMethod( 'getAttachmentCode' );
-		$method->setAccessible( true );
 
 		$result = $method->invoke( $email, $tmpFile );
 
@@ -185,7 +181,6 @@ class EmailTest extends TestCase
 
 		$reflection = new \ReflectionClass( $email );
 		$method = $reflection->getMethod( 'getAttachmentCode' );
-		$method->setAccessible( true );
 
 		$result = $method->invoke( $email, $tmpFile );
 
