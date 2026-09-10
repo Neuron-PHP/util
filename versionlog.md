@@ -1,3 +1,5 @@
+## 0.6.11 2026-09-10
+
 ## 0.7.0 2025-12-11
 * **WebHook refactored to use system abstractions** - Now uses `IHttpClient` interface instead of direct curl calls
 * Added `neuron-php/core` 0.8.* dependency for system abstractions

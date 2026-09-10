@@ -331,7 +331,6 @@ class WebHookTest extends TestCase
 
 		$reflection = new \ReflectionClass( $this->webhook );
 		$method = $reflection->getMethod( 'convertResponse' );
-		$method->setAccessible( true );
 
 		$webHookResponse = $method->invoke( $this->webhook, $httpResponse );
 
@@ -351,7 +350,6 @@ class WebHookTest extends TestCase
 		// MemoryHttpClient stores timeout internally
 		$reflection = new \ReflectionClass( $client );
 		$property = $reflection->getProperty( 'timeout' );
-		$property->setAccessible( true );
 
 		$this->assertEquals( 10, $property->getValue( $client ) );
 	}
